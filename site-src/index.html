@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 导演：用文字拍电影 · AI Director</title>
+<style>
+:root{--bg:#fff8f0;--card:#fff;--ink:#3a2e22;--muted:#8a7a68;--accent:#e8833a;--accent2:#2e9e6b;--line:#f0e2d0}
+*{box-sizing:border-box}body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);margin:0;line-height:1.75}
+nav{position:sticky;top:0;z-index:10;background:rgba(255,248,240,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:.6rem 1rem;display:flex;justify-content:space-between;align-items:center}
+nav .brand{font-weight:800;cursor:pointer}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{border:0;background:transparent;padding:.35rem .9rem;cursor:pointer;font-size:.9rem;color:var(--muted)}
+.lang button.on{background:var(--accent);color:#fff;font-weight:700}
+main{max-width:860px;margin:0 auto;padding:1.2rem 1rem 4rem}
+.hero{text-align:center;padding:2.2rem 1rem}
+.hero h1{font-size:2rem;margin:.4rem 0}
+.hero .en{color:var(--muted);font-size:1rem}
+.badge{display:inline-block;background:#ffe9d2;color:#b35c14;border-radius:999px;padding:.2rem .8rem;font-size:.8rem;margin:.15rem}
+section{margin:2.2rem 0}
+h2.sec{font-size:1.3rem;border-left:5px solid var(--accent);padding-left:.6rem;margin-bottom:1rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;margin:.8rem 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.prob{display:flex;gap:.7rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px dashed var(--line)}
+.prob:last-child{border:0}.prob .n{background:var(--accent);color:#fff;width:1.6rem;height:1.6rem;border-radius:50%;flex:none;text-align:center;line-height:1.6rem;font-size:.85rem;font-weight:700}
+.chap{display:flex;justify-content:space-between;align-items:center;gap:.8rem;padding:.7rem .2rem;border-bottom:1px dashed var(--line);cursor:pointer}
+.chap:last-child{border:0}.chap:hover .t{color:var(--accent)}
+.chap .t{font-weight:700}.chap .s{color:var(--muted);font-size:.85rem}
+.pill{font-size:.75rem;border-radius:999px;padding:.15rem .6rem;flex:none}
+.pill.ok{background:#dff5e8;color:#1e7a4c}.pill.todo{background:#f3ede4;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.person{text-align:center}.person .av{font-size:2.6rem}
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media(max-width:640px){.gallery{grid-template-columns:1fr}}
+.gallery figure{margin:0;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.gallery img{width:100%;display:block}
+.gallery figcaption{padding:.5rem .8rem;font-size:.85rem;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:3rem}
+#view-reader .toolbar{display:flex;gap:.6rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:.4rem 1rem;cursor:pointer;font-size:.9rem}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn:disabled{opacity:.4;cursor:default}
+article{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.6rem 1.4rem;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+article img{max-width:100%;border-radius:10px;margin:.8rem 0}
+article h1{font-size:1.5rem}article h2{font-size:1.25rem;margin-top:1.6rem;border-left:4px solid var(--accent);padding-left:.5rem}
+article h3{font-size:1.1rem}article blockquote{border-left:4px solid var(--accent2);margin:1rem 0;padding:.4rem 1rem;background:#f4faf6;border-radius:0 8px 8px 0;color:#4a5a50}
+article pre{background:#2b2b2b;color:#f8f8f2;border-radius:10px;padding:1rem;overflow-x:auto}
+article code{background:#f6ecdd;border-radius:4px;padding:.1rem .35rem;font-size:.9em}
+article pre code{background:transparent;padding:0}
+article ul,article ol{padding-left:1.4rem}
+article li{margin:.3rem 0}article hr{border:0;border-top:1px solid var(--line);margin:1.5rem 0}
+.notice{background:#fff7e8;border:1px solid #f0d9a8;border-radius:12px;padding:1.4rem;text-align:center}
+.pagenav{display:flex;justify-content:space-between;margin-top:1.2rem;gap:.6rem}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand" id="brand">🎬 AI 导演：用文字拍电影</div>
+  <div class="lang"><button id="btn-zh" class="on">中文</button><button id="btn-en">EN</button></div>
+</nav>
+<main>
+  <div id="view-home">
+    <div class="hero">
+      <div><span class="badge" id="b1"></span><span class="badge" id="b2"></span><span class="badge" id="b3"></span></div>
+      <h1 id="hero-title"></h1>
+      <div class="en" id="hero-en"></div>
+      <p id="hero-sub" style="color:var(--muted)"></p>
+    </div>
+    <section><h2 class="sec" id="t-prob"></h2><div class="card" id="problems"></div></section>
+    <section><h2 class="sec" id="t-toc"></h2><div class="card" id="toc" style="padding:.4rem 1.2rem"></div></section>
+    <section><h2 class="sec" id="t-chars"></h2><div class="grid2" id="chars"></div></section>
+    <section><h2 class="sec" id="t-gallery"></h2><div class="gallery" id="gallery"></div></section>
+    <section><h2 class="sec" id="t-book1"></h2><div class="card" id="book1"></div></section>
+    <section><h2 class="sec" id="t-hw"></h2><div class="card" id="homework"></div></section>
+    <footer id="foot"></footer>
+  </div>
+  <div id="view-reader" hidden>
+    <div class="toolbar">
+      <button class="btn" id="back">← <span id="back-t"></span></button>
+      <span style="flex:1"></span>
+      <button class="btn" id="prev"></button>
+      <button class="btn" id="next"></button>
+    </div>
+    <div id="reader-body"></div>
+    <div class="pagenav">
+      <button class="btn" id="prev2"></button>
+      <button class="btn" id="next2"></button>
+    </div>
+  </div>
+</main>
+<script>
+/* ---------------- i18n ---------------- */
+const T = {
+zh:{
+  brand:"🎬 AI 导演：用文字拍电影", b1:"给 13+ 的 AI 导演第一课", b2:"运镜 × 剪辑 × AI 视频提示词", b3:"每章配图 · 每章填空题",
+  heroT:"AI 导演：用文字拍电影", heroEN:"AI Director: Shooting Films with Words",
+  heroSub:"视频 = 24 张照片/秒 + 声音 + 故事。学 15 个决定（摄影 8 + 视频 7：运镜/节奏/转场/声音/故事/一致性/分镜），把脑子里的故事翻译成一句句能指挥 AI 的话。",
+  tProb:"🧱 先看问题墙：10 个视频翻车",
+  tToc:"📖 目录（点进去直接读全文）", tChars:"👥 谁在拍", tGal:"🎨 插图", tHw:"📝 每章作业：填空题", tBook1:"📚 第一部：《AI 摄影师：用文字拍照》",
+  probs:["AI 生成的人，第 1 秒和第 10 秒长得不一样","运镜写了\"缓慢推近\",AI 直接起飞了","人物嘴在动，声音对不上","我说 3 秒，它给了 10 秒","转场太花，像 PPT","BGM 盖过了人声","15 秒讲了个寂寞","分镜写了 8 个镜头，AI 只听懂 3 个","风格上一秒电影，下一秒动画","拍是拍了，剪辑时发现故事讲不圆"],
+  chars:[
+    {av:"🎬",n:"导演（就是你）",d:"13+，手机就是剧组，AI 就是演员。一条 15 秒的片子，从分镜到成片，一个人就是一支队伍。"},
+    {av:"🐱",n:"主角（你家猫）",d:"本书首席演员，出演第 6、8 章的\'复仇\'大戏。记得给它写角色卡，不然第 3 个镜头它就换了张脸。"}],
+  homework:"<b>填空题</b>：填上<b>你的 15 秒短视频</b>（分镜/运镜/声音/故事……），填完就是分镜表的一行。<b>明天交一条分镜或一个镜头</b> + 填好的句子，课上先看分镜再开新章。",
+  foot:"《AI 导演：用文字拍电影》· AI Director · 在 GitHub 上开源写作",
+  back:"目录", done:"已写", soon:"待写",
+  book1:'摄影的 8 个决定是这本书的地基。没学过的，先看第一部第 1 章 → <a href="https://ezcat207.github.io/ai-photography/#c=01">站内直达</a> · <a href="https://ezcat207.github.io/ai-photography/">第一部阅读站</a>', 
+  noZhT:"这一章还没写", noZhD:"中文版还在写作中，敬请期待。",
+  noEnT:"英文版还没写完", noEnD:"这一章的英文版还在路上，先看中文版？", noEnBtn:"看中文版",
+  prev:"← 上一章", next:"下一章 →",
+  gal:[["images/intro-director.webp","引言：少年导演，自制片场"],["images/ch00-wall.webp","第 0 章：视频翻车墙"],["images/ch01-map.webp","第 1 章：15 个决定的地图"],["images/ch02-movement.webp","第 2 章：运镜跟拍"],["images/ch03-timeline.webp","第 3 章：剪辑时间线"],["images/ch04-matchcut.webp","第 4 章：匹配剪辑"],["images/ch05-sound.webp","第 5 章：调声音"],["images/ch06-story.webp","第 6 章：故事线"],["images/ch07-consistency.webp","第 7 章：一致性九宫格"],["images/ch08-storyboard.webp","第 8 章：分镜表"],["images/ch09-editing.webp","第 9 章：组装"],["images/ch10-bloopers.webp","第 10 章：翻车拼图"],["images/ch11-premiere.webp","第 11 章：小首映礼"]]
+},
+en:{
+  brand:"🎬 AI Director", b1:"AI directing 101 for ages 13+", b2:"Camera movement × editing × AI video prompts", b3:"Illustrated · fill-in-the-blank homework",
+  heroT:"AI Director: Shooting Films with Words", heroEN:"AI 导演：用文字拍电影",
+  heroSub:"Video = 24 photos/sec + sound + story. Learn 15 decisions (8 photography + 7 video: movement/pacing/transitions/sound/story/consistency/storyboard), and translate the story in your head into prompts that direct AI.",
+  tProb:"🧱 The Wall of Problems: 10 video face-plants",
+  tToc:"📖 Contents (tap to read the full chapter)", tChars:"👥 Who shoots", tGal:"🎨 Illustrations", tHw:"📝 Homework: fill in the blanks", tBook1:"📚 Part One: AI Photographer",
+  probs:["The AI person looks different in second 1 vs second 10","I wrote \"slow push in\", the AI took off flying","Lips move but the sound doesn't match","I said 3 seconds, it gave me 10","Transitions so flashy it's a slideshow","The BGM drowns out the voice","15 seconds of nothing","8 shots storyboarded, the AI got 3","Movie style one second, cartoon the next","Shot it all, then the story wouldn't cut together"],
+  chars:[
+    {av:"🎬",n:"The director (that's you)",d:"13+, your phone is the crew and AI is the cast. One 15-second short, from storyboard to final cut — a one-person film studio."},
+    {av:"🐱",n:"The lead (your cat)",d:"This book's star actor, headlining the \'revenge\' saga in Ch. 6 and 8. Write it a character card, or it'll get a new face by shot 3."}],
+  homework:"<b>Fill in the blanks</b>: fill them with <b>your 15-second short</b> (storyboard/movement/sound/story…), and the filled sentence is one storyboard row. <b>Turn in one storyboard row or one shot tomorrow</b> + your sentence; class starts with storyboards.",
+  foot:"AI Director: Shooting Films with Words · written in the open on GitHub",
+  back:"Contents", done:"Published", soon:"Coming soon",
+  book1:'The 8 decisions of photography are this book\'s foundation. New here? Start with Part One Ch. 1 → <a href="https://ezcat207.github.io/ai-photography/#c=01">open</a> · <a href="https://ezcat207.github.io/ai-photography/">Part One reader</a>', 
+  noZhT:"Not written yet", noZhD:"This chapter is still being written. Stay tuned.",
+  noEnT:"English version not ready yet", noEnD:"This chapter's English version is on its way. Read the Chinese version meanwhile?", noEnBtn:"Read Chinese version",
+  prev:"← Prev", next:"Next →",
+  gal:[["images/intro-director.webp","Intro: teen director, DIY set"],["images/ch00-wall.webp","Ch. 0: blooper wall"],["images/ch01-map.webp","Ch. 1: map of 15 decisions"],["images/ch02-movement.webp","Ch. 2: follow shot"],["images/ch03-timeline.webp","Ch. 3: editing timeline"],["images/ch04-matchcut.webp","Ch. 4: match cut"],["images/ch05-sound.webp","Ch. 5: mixing sound"],["images/ch06-story.webp","Ch. 6: story arc"],["images/ch07-consistency.webp","Ch. 7: consistency grid"],["images/ch08-storyboard.webp","Ch. 8: storyboard"],["images/ch09-editing.webp","Ch. 9: assembly"],["images/ch10-bloopers.webp","Ch. 10: blooper grid"],["images/ch11-premiere.webp","Ch. 11: mini premiere"]]
+}};
+const CHAPTERS=[
+ {id:"intro",zhT:"引言：先看一条 15 秒的片子",enT:"Introduction: Watch a 15-Second Short",zh:"introduction.md",en:""},
+ {id:"00",zhT:"第 0 章 问题墙：一面视频翻车墙",enT:"Ch. 0 — Wall of Video Bloopers",zh:"chapters/00-wall.md",en:""},
+ {id:"01",zhT:"第 1 章：一部片子，十五个决定",enT:"Ch. 1 — One Film, Fifteen Decisions",zh:"chapters/01-fifteen-decisions.md",en:""},
+ {id:"02",zhT:"第 2 章 运镜：让镜头动起来",enT:"Ch. 2 — Camera Movement",zh:"chapters/02-camera-movement.md",en:""},
+ {id:"03",zhT:"第 3 章 时长与节奏：什么时候切",enT:"Ch. 3 — Pacing",zh:"chapters/03-pacing.md",en:""},
+ {id:"04",zhT:"第 4 章 转场：镜头的标点符号",enT:"Ch. 4 — Transitions",zh:"chapters/04-transitions.md",en:""},
+ {id:"05",zhT:"第 5 章 声音：画面的一半",enT:"Ch. 5 — Sound",zh:"chapters/05-sound.md",en:""},
+ {id:"06",zhT:"第 6 章 故事：起承转合",enT:"Ch. 6 — Story",zh:"chapters/06-story.md",en:""},
+ {id:"07",zhT:"第 7 章 一致性：AI 时代最难的一课",enT:"Ch. 7 — Consistency",zh:"chapters/07-consistency.md",en:""},
+ {id:"08",zhT:"第 8 章 分镜：导演的施工图",enT:"Ch. 8 — Storyboard",zh:"chapters/08-storyboard.md",en:""},
+ {id:"09",zhT:"第 9 章 剪辑组装：把珠子串成链",enT:"Ch. 9 — Editing",zh:"chapters/09-editing.md",en:""},
+ {id:"10",zhT:"第 10 章 翻车现场：12 个问题集中修",enT:"Ch. 10 — Bloopers",zh:"chapters/10-bloopers.md",en:""},
+ {id:"11",zhT:"第 11 章 毕业作品：我的 15 秒短片",enT:"Ch. 11 — Final Project",zh:"chapters/11-final.md",en:""},
+ {id:"pa",zhT:"附录 A 万能句式卡",enT:"Appendix A — Shot Cheat Sheet",zh:"chapters/appendix-a-cheatsheet.md",en:""},
+ {id:"pb",zhT:"附录 B 中英词汇对照表",enT:"Appendix B — Glossary",zh:"chapters/appendix-b-glossary.md",en:""},
+ {id:"pc",zhT:"附录 C 工具对照表",enT:"Appendix C — Tools",zh:"chapters/appendix-c-tools.md",en:""}
+];
+let lang = "zh";
+const $ = id => document.getElementById(id);
+
+/* ---------------- markdown parser ---------------- */
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function inline(s){
+  s = esc(s);
+  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img src="'+encodeURI("$2")+'" alt="$1">');
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2">$1</a>');
+  s = s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  s = s.replace(/(^|[^*])\*([^*\n]+)\*/g,"$1<em>$2</em>");
+  s = s.replace(/`([^`]+)`/g,"<code>$1</code>");
+  return s;
+}
+function parseMarkdown(md){
+  const lines = md.split("\n"); let html="", i=0, inCode=false, buf=[], stack=[];
+  const close=function(){while(stack.length) html += stack.pop()==="ul" ? "</ul>" : "</ol>";};
+  while(i<lines.length){
+    const line = lines[i];
+    if(line.indexOf("```")===0){
+      if(!inCode){inCode=true;buf=[];} else {inCode=false; html+="<pre><code>"+esc(buf.join("\n"))+"</code></pre>";}
+      i++; continue;
+    }
+    if(inCode){buf.push(line); i++; continue;}
+    const t = line.trim(); let m;
+    if(!t){close(); i++; continue;}
+    if(t.indexOf("### ")===0){close(); html+="<h3>"+inline(t.slice(4))+"</h3>";}
+    else if(t.indexOf("## ")===0){close(); html+="<h2>"+inline(t.slice(3))+"</h2>";}
+    else if(t.indexOf("# ")===0){close(); html+="<h1>"+inline(t.slice(2))+"</h1>";}
+    else if(t==="---"){close(); html+="<hr>";}
+    else if(t.indexOf("> ")===0){close(); html+="<blockquote>"+inline(t.slice(2))+"</blockquote>";}
+    else if(m=t.match(/^(\d+)\.\s+(.*)/)){ if(stack[stack.length-1]!=="ol"){close(); html+="<ol>"; stack.push("ol");} html+="<li>"+inline(m[2])+"</li>";}
+    else if(m=t.match(/^[-*]\s+(.*)/)){ if(stack[stack.length-1]!=="ul"){close(); html+="<ul>"; stack.push("ul");} html+="<li>"+inline(m[1])+"</li>";}
+    else {close(); html+="<p>"+inline(t)+"</p>";}
+    i++;
+  }
+  close(); return html;
+}
+
+/* ---------------- views ---------------- */
+function titleOf(c){ return lang==="zh" ? c.zhT : c.enT; }
+function fileOf(c){ return lang==="zh" ? c.zh : c.en; }
+
+function renderHome(){
+  const t = T[lang];
+  document.documentElement.lang = lang==="zh" ? "zh-CN" : "en";
+  document.title = lang==="zh" ? "AI 导演：用文字拍电影" : "AI Director: Shooting Films with Words";
+  $("brand").textContent = t.brand;
+  $("btn-zh").className = lang==="zh" ? "on" : ""; $("btn-en").className = lang==="en" ? "on" : "";
+  $("b1").textContent=t.b1; $("b2").textContent=t.b2; $("b3").textContent=t.b3;
+  $("hero-title").textContent=t.heroT; $("hero-en").textContent=t.heroEN; $("hero-sub").textContent=t.heroSub;
+  $("t-prob").textContent=t.tProb; $("t-toc").textContent=t.tToc; $("t-chars").textContent=t.tChars;
+  $("t-gallery").textContent=t.tGal; $("t-hw").textContent=t.tHw; $("t-book1").textContent=t.tBook1;
+  $("problems").innerHTML = t.probs.map(function(p,i){return '<div class="prob"><div class="n">'+(i+1)+'</div><div>'+p+'</div></div>';}).join("");
+  $("toc").innerHTML = CHAPTERS.map(function(c){
+    const ok = !!fileOf(c);
+    return '<div class="chap" data-id="'+c.id+'"><div class="t">'+titleOf(c)+'</div>'+
+      '<span class="pill '+(ok?"ok":"todo")+'">'+(ok?t.done:t.soon)+'</span></div>';
+  }).join("");
+  Array.prototype.forEach.call(document.querySelectorAll(".chap"),function(el){el.onclick=function(){openChapter(el.dataset.id);};});
+  $("chars").innerHTML = t.chars.map(function(c){return '<div class="card person"><div class="av">'+c.av+'</div><b>'+c.n+'</b><p style="color:var(--muted);font-size:.9rem">'+c.d+'</p></div>';}).join("");
+  $("gallery").innerHTML = t.gal.map(function(g){return '<figure><img loading="lazy" src="'+encodeURI(g[0])+'" alt=""><figcaption>'+g[1]+'</figcaption></figure>';}).join("");
+  $("homework").innerHTML = t.homework;
+  $("book1").innerHTML = t.book1;
+  $("foot").textContent = t.foot;
+  $("view-home").hidden=false; $("view-reader").hidden=true;
+  window.scrollTo(0,0);
+}
+async function openChapter(id){
+  const c = CHAPTERS.find(function(x){return x.id===id;}); if(!c) return;
+  const t = T[lang];
+  $("view-home").hidden=true; $("view-reader").hidden=false;
+  $("back-t").textContent=t.back; $("prev").textContent=t.prev; $("next").textContent=t.next;
+  $("prev2").textContent=t.prev; $("next2").textContent=t.next;
+  const idx = CHAPTERS.indexOf(c);
+  const go = function(d){ const n = CHAPTERS[idx+d]; if(n) openChapter(n.id); };
+  $("prev").onclick=function(){go(-1);}; $("prev2").onclick=function(){go(-1);};
+  $("next").onclick=function(){go(1);}; $("next2").onclick=function(){go(1);};
+  $("prev").disabled=$("prev2").disabled = idx===0;
+  $("next").disabled=$("next2").disabled = idx===CHAPTERS.length-1;
+  const body = $("reader-body");
+  const f = fileOf(c);
+  if(!f){
+    const otherF = lang==="zh" ? c.en : c.zh;
+    body.innerHTML = '<div class="notice"><h3>'+(lang==="zh"?t.noZhT:t.noEnT)+'</h3><p>'+(lang==="zh"?t.noZhD:t.noEnD)+'</p>'+
+      (otherF ? '<p><button class="btn primary" id="otherLang">'+(lang==="zh"?t.noEnBtn:"Read Chinese version")+'</button></p>' : '')+'</div>';
+    const b = $("otherLang");
+    if(b) b.onclick=function(){ setLang(lang==="zh"?"en":"zh"); };
+    location.hash = "c="+id; window.scrollTo(0,0); return;
+  }
+  body.innerHTML = '<div class="card">loading…</div>';
+  try{
+    const r = await fetch(encodeURI(f));
+    if(!r.ok) throw 0;
+    const md = await r.text();
+    body.innerHTML = "<article>"+parseMarkdown(md)+"</article>";
+  }catch(e){
+    body.innerHTML = '<div class="notice"><h3>⚠️</h3><p>'+f+'</p></div>';
+  }
+  location.hash = "c="+id; window.scrollTo(0,0);
+}
+function setLang(l){
+  lang=l; renderHome();
+  const h=location.hash;
+  if(h.indexOf("#c=")===0) openChapter(h.slice(3));
+}
+$("btn-zh").onclick=function(){setLang("zh");};
+$("btn-en").onclick=function(){setLang("en");};
+$("brand").onclick=function(){location.hash=""; renderHome();};
+$("back").onclick=function(){location.hash=""; renderHome();};
+(function init(){
+  renderHome();
+  const h=location.hash;
+  if(h.indexOf("#c=")===0) openChapter(h.slice(3));
+})();
+</script>
+</body>
+</html>
